@@ -418,3 +418,29 @@ a  { color: inherit; text-decoration: none; }
   border-radius: var(--radius-sm);
 }
 .remove-btn:hover { color: #E76F51; background: #FFF0EB; }
+
+/* --- Empty state --- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  text-align: center;
+  min-height: 300px;
+  gap: var(--space-md);
+}
+
+.empty-state__icon { font-size: 48px; }
+
+.empty-state__title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.empty-state__text {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  max-width: 400px;
+}
