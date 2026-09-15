@@ -71,6 +71,23 @@ def calcular_nutricion_receta(receta):
         "por_porcion": por_porcion
     }
 
+def escalar_receta(receta, nuevas_porciones):
+    """
+    Retorna una nueva receta ajustada a las porciones deseadas.
+    No modifica la receta original.
+    """
+    if nuevas_porciones <= 0:
+        raise ValueError(f"Las porciones deben ser positivas. Recibido: {nuevas_porciones}")
+
+    factor = nuevas_porciones / receta["porciones"]
+
+    ingredientes_escalados = [
+        {**ing, "cantidad_g": round(ing["cantidad_g"] * factor, 1)}
+        for ing in receta["ingredientes"]
+    ]
+
+    return crear_receta(receta["nombre"], nuevas_porciones, ingredientes_escalados)
+
 def imprimir_reporte(nutricion):
     """Imprime un reporte legible de la información nutricional."""
     print(f"\n{'='*40}")
@@ -104,3 +121,8 @@ if __name__ == "__main__":
 
     nutricion = calcular_nutricion_receta(receta_avena)
     imprimir_reporte(nutricion)
+
+    # Tu receta base es para 2 porciones
+    # Escálala a 5 — para toda la semana
+    receta_semana = escalar_receta(receta_avena, 5)
+    print(imprimir_reporte(calcular_nutricion_receta(receta_semana)))
