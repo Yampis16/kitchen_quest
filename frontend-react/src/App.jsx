@@ -30,11 +30,25 @@ const initialRecipes = [
 ]
 
 function App() {
-  const [recipes, setRecipes]         = useState(initialRecipes)
+  const [recipes, setRecipes] = useState(() => {
+  // Esta función corre UNA sola vez cuando la app carga
+  const saved = localStorage.getItem('kq-recipes')
+  if (saved) {
+    try {
+      return JSON.parse(saved)
+    } catch (e) {
+      console.error('Error parsing saved recipes:', e)
+      return initialRecipes
+    }} else {
+      return initialRecipes
+    }
+  })
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   function handleSaveRecipe(newRecipe) {
-    setRecipes(prev => [...prev, newRecipe])
+    const updatedRecipes = [...recipes, newRecipe]
+    setRecipes(updatedRecipes)
+    localStorage.setItem('kq-recipes', JSON.stringify(updatedRecipes))
     setIsModalOpen(false)
   }
 
