@@ -1,47 +1,17 @@
 // src/components/RecipeCard.jsx
-
-function calcularNutricion(recipe) {
-  const totals = { calories: 0, protein: 0, carbs: 0, fat: 0 };
-
-  for (const ing of recipe.ingredients) {
-    const factor = ing.grams / 100;
-    totals.calories += ing.cal     * factor;
-    totals.protein  += ing.protein * factor;
-    totals.carbs    += ing.carbs   * factor;
-    totals.fat      += ing.fat     * factor;
-  }
-
-  return {
-    calories: Math.round(totals.calories / recipe.portions * 10) / 10,
-    protein:  Math.round(totals.protein  / recipe.portions * 10) / 10,
-    carbs:    Math.round(totals.carbs    / recipe.portions * 10) / 10,
-    fat:      Math.round(totals.fat      / recipe.portions * 10) / 10,
-  };
-}
-
+import { calcularNutricionReceta } from '../utils/nutrition'
 
 function MacroBar({ nutrition }) {
-  const total = nutrition.protein + nutrition.carbs + nutrition.fat;
-  if (total === 0) return <div className="macro-bar" />;
-
+  const total = nutrition.prot + nutrition.carbs + nutrition.grasas
+  if (total === 0) return <div className="macro-bar" />
   return (
     <div className="macro-bar">
-      <div
-        className="macro-bar__segment macro-bar__segment--protein"
-        style={{ flex: nutrition.protein / total }}
-      />
-      <div
-        className="macro-bar__segment macro-bar__segment--carbs"
-        style={{ flex: nutrition.carbs / total }}
-      />
-      <div
-        className="macro-bar__segment macro-bar__segment--fat"
-        style={{ flex: nutrition.fat / total }}
-      />
+      <div className="macro-bar__segment macro-bar__segment--protein" style={{ flex: nutrition.prot   / total }} />
+      <div className="macro-bar__segment macro-bar__segment--carbs"   style={{ flex: nutrition.carbs  / total }} />
+      <div className="macro-bar__segment macro-bar__segment--fat"     style={{ flex: nutrition.grasas / total }} />
     </div>
-  );
+  )
 }
-
 
 function MacroItem({ value, label, colorClass }) {
   return (
@@ -49,43 +19,26 @@ function MacroItem({ value, label, colorClass }) {
       <span className={`macro-item__value ${colorClass}`}>{value}</span>
       <span className="macro-item__label">{label}</span>
     </div>
-  );
+  )
 }
 
-
-function RecipeCard({ recipe }) {
-  const nutrition = calcularNutricion(recipe);
+function RecipeCard({ recipe, ingredients }) {
+  const nutrition = calcularNutricionReceta(recipe, ingredients)
 
   return (
     <article className="recipe-card">
       <div className="recipe-card__header">
-        <h2 className="recipe-card__name">{recipe.name}</h2>
-        <span className="recipe-card__portions">{recipe.portions} porciones</span>
+        <h2 className="recipe-card__name">{recipe.nombre}</h2>
+        <span className="recipe-card__portions">{recipe.porciones} porciones</span>
       </div>
 
       <MacroBar nutrition={nutrition} />
 
       <div className="macro-grid">
-        <MacroItem
-          value={nutrition.calories}
-          label="kcal"
-          colorClass="macro-item__value--calories"
-        />
-        <MacroItem
-          value={`${nutrition.protein}g`}
-          label="proteína"
-          colorClass="macro-item__value--protein"
-        />
-        <MacroItem
-          value={`${nutrition.carbs}g`}
-          label="carbos"
-          colorClass="macro-item__value--carbs"
-        />
-        <MacroItem
-          value={`${nutrition.fat}g`}
-          label="grasa"
-          colorClass="macro-item__value--fat"
-        />
+        <MacroItem value={nutrition.kcal}          label="kcal"     colorClass="macro-item__value--calories" />
+        <MacroItem value={`${nutrition.prot}g`}    label="proteína" colorClass="macro-item__value--protein"  />
+        <MacroItem value={`${nutrition.carbs}g`}   label="carbos"   colorClass="macro-item__value--carbs"    />
+        <MacroItem value={`${nutrition.grasas}g`}  label="grasa"    colorClass="macro-item__value--fat"      />
       </div>
 
       <div className="recipe-card__footer">
@@ -93,7 +46,7 @@ function RecipeCard({ recipe }) {
         <button className="btn btn--ghost btn--sm">Ver receta →</button>
       </div>
     </article>
-  );
+  )
 }
 
-export default RecipeCard;
+export default RecipeCard
