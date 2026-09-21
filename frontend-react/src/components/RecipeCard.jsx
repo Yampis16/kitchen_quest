@@ -1,4 +1,5 @@
 // src/components/RecipeCard.jsx
+import useKitchenStore from '../store/useKitchenStore'
 import { calcularNutricionReceta } from '../utils/nutrition'
 
 function MacroBar({ nutrition }) {
@@ -23,8 +24,9 @@ function MacroItem({ value, label, color }) {
   )
 }
 
-function RecipeCard({ recipe, ingredients }) {
-  const nutrition = calcularNutricionReceta(recipe, ingredients)
+function RecipeCard({ recipe }) {
+  const ingredients = useKitchenStore(state => state.ingredients)
+  const nutrition   = calcularNutricionReceta(recipe, ingredients)
 
   return (
     <article className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col gap-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer min-h-[200px]">

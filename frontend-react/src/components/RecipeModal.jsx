@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { generateId } from '../utils/storage'
+import useKitchenStore from '../store/useKitchenStore'
 
 function IngredientSearch({ ingredients, onSelect }) {
   const [query, setQuery]           = useState('')
@@ -46,7 +47,9 @@ function IngredientSearch({ ingredients, onSelect }) {
   )
 }
 
-function RecipeModal({ ingredients, onClose, onSave, onAddIngredient }) {
+function RecipeModal({ onClose, onSave }) {
+  const ingredients    = useKitchenStore(state => state.ingredients)
+  const addIngredient  = useKitchenStore(state => state.addIngredient)
   const [nombre,    setNombre]    = useState('')
   const [porciones, setPorciones] = useState(1)
   const [tag,       setTag]       = useState('🌅 Desayuno')
@@ -84,7 +87,7 @@ function RecipeModal({ ingredients, onClose, onSave, onAddIngredient }) {
       carbs:  parseFloat(newIng.carbs)  || 0,
       grasas: parseFloat(newIng.grasas) || 0,
     }
-    onAddIngredient(created)
+    addIngredient(created)
     handleSelectIngredient(created)
     setNewIngredientMode(false)
     setNewIng({ nombre: '', tag: 'vegetal', kcal: '', prot: '', carbs: '', grasas: '' })

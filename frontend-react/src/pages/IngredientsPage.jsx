@@ -1,6 +1,7 @@
 // src/pages/IngredientsPage.jsx
 import { useState } from 'react'
 import { generateId } from '../utils/storage'
+import useKitchenStore from '../store/useKitchenStore'
 
 const TAGS = ['vegetal', 'fruta', 'proteína', 'lácteo', 'despensa', 'legumbre', 'grasa', 'otro']
 
@@ -167,19 +168,19 @@ function NewIngredientRow({ onSave, onCancel }) {
 }
 
 // ── Vista principal ──────────────────────────────────────────
-function IngredientsPage({ ingredients, onAdd, onUpdate, onDelete }) {
+function IngredientsPage() {
   const [showNewRow, setShowNewRow] = useState(false)
   const [search, setSearch]         = useState('')
+
+  const ingredients     = useKitchenStore(state => state.ingredients)
+  const addIngredient   = useKitchenStore(state => state.addIngredient)
+  const updateIngredient = useKitchenStore(state => state.updateIngredient)
+  const deleteIngredient = useKitchenStore(state => state.deleteIngredient)
 
   const filtered = ingredients.filter(i =>
     i.nombre.toLowerCase().includes(search.toLowerCase()) ||
     i.tag.toLowerCase().includes(search.toLowerCase())
   )
-
-  function handleAdd(newIng) {
-    onAdd(newIng)
-    setShowNewRow(false)
-  }
 
   const thCls = "px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wide"
 
@@ -231,7 +232,7 @@ function IngredientsPage({ ingredients, onAdd, onUpdate, onDelete }) {
             <tbody>
               {showNewRow && (
                 <NewIngredientRow
-                  onSave={handleAdd}
+                  onSave={addIngredient}
                   onCancel={() => setShowNewRow(false)}
                 />
               )}
@@ -239,8 +240,8 @@ function IngredientsPage({ ingredients, onAdd, onUpdate, onDelete }) {
                 <IngredientRow
                   key={ing.id}
                   ingredient={ing}
-                  onUpdate={onUpdate}
-                  onDelete={onDelete}
+                  onUpdate={updateIngredient}
+                  onDelete={deleteIngredient}
                 />
               ))}
               {filtered.length === 0 && !showNewRow && (

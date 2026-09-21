@@ -1,22 +1,19 @@
 // src/App.jsx
-import { useState } from 'react'
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
-import { loadRecipes, saveRecipes, loadIngredients, saveIngredients } from './utils/storage'
 import RecipesPage      from './pages/RecipesPage'
 import WeeklyMenuPage   from './pages/WeeklyMenuPage'
 import ShoppingListPage from './pages/ShoppingListPage'
-import IngredientsPage from './pages/IngredientsPage'
+import IngredientsPage  from './pages/IngredientsPage'
 
 function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
-
-        <div className="flex items-center gap-2 text-lg font-bold" style={{ color: 'var(--color-primary)' }}>
+        <div className="flex items-center gap-2 text-lg font-bold"
+          style={{ color: 'var(--color-primary)' }}>
           <span className="text-2xl">🍳</span>
           <span>Kitchen Quest</span>
         </div>
-
         <div className="flex items-center gap-8">
           {[
             { to: '/recetas',      label: 'Recetas'      },
@@ -24,9 +21,7 @@ function Navbar() {
             { to: '/mercado',      label: 'Mercado'      },
             { to: '/ingredientes', label: 'Ingredientes' },
           ].map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
+            <NavLink key={to} to={to}
               className={({ isActive }) =>
                 `text-sm font-medium pb-0.5 border-b-2 transition-colors duration-200 ${
                   isActive
@@ -39,64 +34,22 @@ function Navbar() {
             </NavLink>
           ))}
         </div>
-
       </div>
     </nav>
   )
 }
 
 function App() {
-  const [recipes,     setRecipes]     = useState(loadRecipes)
-  const [ingredients, setIngredients] = useState(loadIngredients)
-
-  function handleSaveRecipe(newRecipe) {
-    const updated = [...recipes, newRecipe]
-    setRecipes(updated)
-    saveRecipes(updated)
-  }
-
-  function handleAddIngredient(newIngredient) {
-    const updated = [...ingredients, newIngredient]
-    setIngredients(updated)
-    saveIngredients(updated)
-  }
-
-  function handleUpdateIngredient(updated) {
-  const list = ingredients.map(i => i.id === updated.id ? updated : i)
-  setIngredients(list)
-  saveIngredients(list)
-}
-
-function handleDeleteIngredient(id) {
-  const list = ingredients.filter(i => i.id !== id)
-  setIngredients(list)
-  saveIngredients(list)
-}
-
   return (
     <BrowserRouter>
       <Navbar />
-      <main className="main">
+      <main className="max-w-6xl mx-auto px-8 py-10">
         <Routes>
-          <Route path="/" element={
-            <RecipesPage
-              recipes={recipes}
-              ingredients={ingredients}
-              onSaveRecipe={handleSaveRecipe}
-              onAddIngredient={handleAddIngredient}
-            />
-          }/>
-          <Route path="/recetas" element={
-            <RecipesPage
-              recipes={recipes}
-              ingredients={ingredients}
-              onSaveRecipe={handleSaveRecipe}
-              onAddIngredient={handleAddIngredient}
-            />
-          }/>
-          <Route path="/menu-semanal"  element={<WeeklyMenuPage  recipes={recipes} ingredients={ingredients} />} />
-          <Route path="/mercado"       element={<ShoppingListPage recipes={recipes} ingredients={ingredients} />} />
-          <Route path="/ingredientes" element={<IngredientsPage ingredients={ingredients} onAdd={handleAddIngredient} onUpdate={handleUpdateIngredient} onDelete={handleDeleteIngredient}/>}/>
+          <Route path="/"             element={<RecipesPage />} />
+          <Route path="/recetas"      element={<RecipesPage />} />
+          <Route path="/menu-semanal" element={<WeeklyMenuPage />} />
+          <Route path="/mercado"      element={<ShoppingListPage />} />
+          <Route path="/ingredientes" element={<IngredientsPage />} />
         </Routes>
       </main>
     </BrowserRouter>
