@@ -5,6 +5,7 @@ import { loadRecipes, saveRecipes, loadIngredients, saveIngredients } from './ut
 import RecipesPage      from './pages/RecipesPage'
 import WeeklyMenuPage   from './pages/WeeklyMenuPage'
 import ShoppingListPage from './pages/ShoppingListPage'
+import IngredientsPage from './pages/IngredientsPage'
 
 function Navbar() {
   return (
@@ -60,6 +61,18 @@ function App() {
     saveIngredients(updated)
   }
 
+  function handleUpdateIngredient(updated) {
+  const list = ingredients.map(i => i.id === updated.id ? updated : i)
+  setIngredients(list)
+  saveIngredients(list)
+}
+
+function handleDeleteIngredient(id) {
+  const list = ingredients.filter(i => i.id !== id)
+  setIngredients(list)
+  saveIngredients(list)
+}
+
   return (
     <BrowserRouter>
       <Navbar />
@@ -83,7 +96,7 @@ function App() {
           }/>
           <Route path="/menu-semanal"  element={<WeeklyMenuPage  recipes={recipes} ingredients={ingredients} />} />
           <Route path="/mercado"       element={<ShoppingListPage recipes={recipes} ingredients={ingredients} />} />
-          <Route path="/ingredientes" element={<WeeklyMenuPage recipes={recipes} ingredients={ingredients} />} />
+          <Route path="/ingredientes" element={<IngredientsPage ingredients={ingredients} onAdd={handleAddIngredient} onUpdate={handleUpdateIngredient} onDelete={handleDeleteIngredient}/>}/>
         </Routes>
       </main>
     </BrowserRouter>
