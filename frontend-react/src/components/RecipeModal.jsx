@@ -1,9 +1,8 @@
-// src/components/RecipeModal.jsx
 import { useState } from 'react'
 import { generateId } from '../utils/storage'
 
 function IngredientSearch({ ingredients, onSelect }) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery]           = useState('')
   const [showResults, setShowResults] = useState(false)
 
   const results = query.length > 1
@@ -19,9 +18,9 @@ function IngredientSearch({ ingredients, onSelect }) {
   }
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div className="relative">
       <input
-        className="form-input"
+        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-[#fdf4e5] focus:outline-none focus:border-[#023d5b] transition-colors"
         type="text"
         placeholder="Buscar ingrediente... (ej: pollo, avena)"
         value={query}
@@ -29,18 +28,16 @@ function IngredientSearch({ ingredients, onSelect }) {
         onFocus={() => setShowResults(true)}
       />
       {showResults && results.length > 0 && (
-        <div className="ingredient-dropdown">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
           {results.map(ing => (
             <button
               key={ing.id}
-              className="ingredient-dropdown__item"
               onClick={() => handleSelect(ing)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[#bed5cf]/30 transition-colors"
             >
-              <span className="ingredient-dropdown__name">{ing.nombre}</span>
-              <span className="ingredient-dropdown__tag">{ing.tag}</span>
-              <span className="ingredient-dropdown__macros">
-                {ing.kcal} kcal · {ing.prot}g prot
-              </span>
+              <span className="text-sm font-medium flex-1">{ing.nombre}</span>
+              <span className="text-xs text-gray-400 px-2 py-0.5 bg-gray-100 rounded-full">{ing.tag}</span>
+              <span className="text-xs text-gray-500">{ing.kcal} kcal · {ing.prot}g prot</span>
             </button>
           ))}
         </div>
@@ -50,12 +47,14 @@ function IngredientSearch({ ingredients, onSelect }) {
 }
 
 function RecipeModal({ ingredients, onClose, onSave, onAddIngredient }) {
-  const [nombre,   setNombre]   = useState('')
+  const [nombre,    setNombre]    = useState('')
   const [porciones, setPorciones] = useState(1)
-  const [tag,      setTag]      = useState('🌅 Desayuno')
+  const [tag,       setTag]       = useState('🌅 Desayuno')
   const [selectedIngredients, setSelectedIngredients] = useState([])
-  const [newIngredientMode, setNewIngredientMode] = useState(false)
-  const [newIng, setNewIng] = useState({ nombre: '', tag: 'vegetal', kcal: '', prot: '', carbs: '', grasas: '' })
+  const [newIngredientMode, setNewIngredientMode]     = useState(false)
+  const [newIng, setNewIng] = useState({
+    nombre: '', tag: 'vegetal', kcal: '', prot: '', carbs: '', grasas: ''
+  })
 
   function handleSelectIngredient(ing) {
     setSelectedIngredients(prev => [
@@ -96,7 +95,7 @@ function RecipeModal({ ingredients, onClose, onSave, onAddIngredient }) {
     if (porciones <= 0)  { alert('Las porciones deben ser mayor a 0'); return }
 
     const ingredientesValidos = selectedIngredients
-      .filter(i => i.grams > 0)
+      .filter(i => parseFloat(i.grams) > 0)
       .map(i => ({ ingredienteId: i.ingredienteId, grams: parseFloat(i.grams) }))
 
     if (ingredientesValidos.length === 0) {
@@ -108,30 +107,36 @@ function RecipeModal({ ingredients, onClose, onSave, onAddIngredient }) {
     onClose()
   }
 
+  const inputCls = "w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-[#fdf4e5] focus:outline-none focus:border-[#023d5b] transition-colors"
+
   return (
-    <div className="modal-overlay open">
-      <div className="modal">
-        <div className="modal__header">
-          <h2 className="modal__title">Nueva Receta</h2>
-          <button className="modal__close" onClick={onClose}>✕</button>
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-semibold">Nueva Receta</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-1.5 transition-colors">✕</button>
         </div>
 
-        <div className="modal__body">
-          <div className="form-group">
-            <label className="form-label">Nombre de la receta</label>
-            <input className="form-input" type="text" placeholder="Ej: Bowl de quinoa"
+        {/* Body */}
+        <div className="px-6 py-5 flex flex-col gap-4">
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-gray-500">Nombre de la receta</label>
+            <input className={inputCls} type="text" placeholder="Ej: Bowl de quinoa"
               value={nombre} onChange={e => setNombre(e.target.value)} />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Porciones</label>
-              <input className="form-input" type="number" min="1"
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-gray-500">Porciones</label>
+              <input className={inputCls} type="number" min="1"
                 value={porciones} onChange={e => setPorciones(parseInt(e.target.value) || 1)} />
             </div>
-            <div className="form-group">
-              <label className="form-label">Categoría</label>
-              <select className="form-input" value={tag} onChange={e => setTag(e.target.value)}>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-gray-500">Categoría</label>
+              <select className={inputCls} value={tag} onChange={e => setTag(e.target.value)}>
                 <option>🌅 Desayuno</option>
                 <option>🍽️ Almuerzo</option>
                 <option>🌙 Cena</option>
@@ -140,67 +145,61 @@ function RecipeModal({ ingredients, onClose, onSave, onAddIngredient }) {
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Ingredientes</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-500">Ingredientes</label>
             <IngredientSearch ingredients={ingredients} onSelect={handleSelectIngredient} />
 
             {selectedIngredients.length > 0 && (
-              <div className="selected-ingredients">
-                <div className="selected-ingredients__header">
-                  <span>Ingrediente</span>
-                  <span>Gramos</span>
-                  <span />
+              <div className="border border-gray-100 rounded-xl overflow-hidden mt-1">
+                <div className="grid grid-cols-[1fr_100px_32px] gap-2 px-4 py-2 bg-gray-50 text-xs text-gray-400 uppercase tracking-wide">
+                  <span>Ingrediente</span><span>Gramos</span><span />
                 </div>
                 {selectedIngredients.map((item, i) => (
-                  <div key={i} className="selected-ingredient-row">
-                    <span className="selected-ingredient-row__name">{item.nombre}</span>
+                  <div key={i} className="grid grid-cols-[1fr_100px_32px] gap-2 px-4 py-2 items-center border-t border-gray-100">
+                    <span className="text-sm">{item.nombre}</span>
                     <input
-                      className="form-input"
-                      type="number"
-                      placeholder="0"
-                      min="0"
+                      className="px-2 py-1.5 border border-gray-200 rounded-lg text-sm bg-[#fdf4e5] focus:outline-none focus:border-[#023d5b]"
+                      type="number" placeholder="0" min="0"
                       value={item.grams}
                       onChange={e => handleGramsChange(i, e.target.value)}
                     />
-                    <button className="remove-btn" onClick={() => handleRemoveIngredient(i)}>×</button>
+                    <button onClick={() => handleRemoveIngredient(i)}
+                      className="text-gray-300 hover:text-red-400 transition-colors text-lg">×</button>
                   </div>
                 ))}
               </div>
             )}
 
             <button
-              className="btn btn--ghost btn--sm"
               onClick={() => setNewIngredientMode(!newIngredientMode)}
-              style={{ marginTop: 8 }}
+              className="text-sm font-medium mt-1 text-left px-3 py-2 border border-dashed border-gray-200 rounded-lg hover:border-[#728d6a] hover:bg-[#bed5cf]/20 transition-colors"
+              style={{ color: 'var(--color-primary)' }}
             >
               {newIngredientMode ? '— Cancelar nuevo ingrediente' : '+ Ingrediente no encontrado'}
             </button>
 
             {newIngredientMode && (
-              <div className="new-ingredient-form">
-                <p className="form-label" style={{ marginBottom: 8 }}>
-                  Nuevo ingrediente (valores por 100g)
-                </p>
-                <div className="new-ingredient-grid">
-                  {[
-                    { field: 'nombre', placeholder: 'Nombre', type: 'text', span: true },
-                    { field: 'tag',    placeholder: 'Categoría', type: 'text' },
-                    { field: 'kcal',   placeholder: 'kcal', type: 'number' },
-                    { field: 'prot',   placeholder: 'prot g', type: 'number' },
-                    { field: 'carbs',  placeholder: 'carbs g', type: 'number' },
-                    { field: 'grasas', placeholder: 'grasa g', type: 'number' },
-                  ].map(({ field, placeholder, type, span }) => (
-                    <input
-                      key={field}
-                      className={`form-input${span ? ' new-ingredient-grid__full' : ''}`}
-                      type={type}
-                      placeholder={placeholder}
-                      value={newIng[field]}
-                      onChange={e => setNewIng(prev => ({ ...prev, [field]: e.target.value }))}
-                    />
-                  ))}
+              <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 flex flex-col gap-3">
+                <p className="text-sm font-medium text-gray-500">Nuevo ingrediente (valores por 100g)</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <input className={`${inputCls} col-span-2`} type="text" placeholder="Nombre"
+                    value={newIng.nombre} onChange={e => setNewIng(p => ({ ...p, nombre: e.target.value }))} />
+                  <input className={inputCls} type="text" placeholder="Categoría (ej: vegetal)"
+                    value={newIng.tag} onChange={e => setNewIng(p => ({ ...p, tag: e.target.value }))} />
+                  <input className={inputCls} type="number" placeholder="kcal"
+                    value={newIng.kcal} onChange={e => setNewIng(p => ({ ...p, kcal: e.target.value }))} />
+                  <input className={inputCls} type="number" placeholder="proteína g"
+                    value={newIng.prot} onChange={e => setNewIng(p => ({ ...p, prot: e.target.value }))} />
+                  <input className={inputCls} type="number" placeholder="carbos g"
+                    value={newIng.carbs} onChange={e => setNewIng(p => ({ ...p, carbs: e.target.value }))} />
+                  <input className={inputCls} type="number" placeholder="grasa g"
+                    value={newIng.grasas} onChange={e => setNewIng(p => ({ ...p, grasas: e.target.value }))} />
                 </div>
-                <button className="btn btn--primary btn--sm" onClick={handleSaveNewIngredient} style={{ marginTop: 8 }}>
+                <button
+                  onClick={handleSaveNewIngredient}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90"
+                  style={{ background: 'var(--color-primary)' }}
+                >
                   Agregar al banco y a la receta
                 </button>
               </div>
@@ -208,10 +207,19 @@ function RecipeModal({ ingredients, onClose, onSave, onAddIngredient }) {
           </div>
         </div>
 
-        <div className="modal__footer">
-          <button className="btn btn--ghost"   onClick={onClose}>Cancelar</button>
-          <button className="btn btn--primary" onClick={handleSave}>Guardar receta</button>
+        {/* Footer */}
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+          <button onClick={onClose}
+            className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <button onClick={handleSave}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90"
+            style={{ background: 'var(--color-primary)' }}>
+            Guardar receta
+          </button>
         </div>
+
       </div>
     </div>
   )

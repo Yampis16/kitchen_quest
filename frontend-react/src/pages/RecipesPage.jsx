@@ -1,4 +1,3 @@
-// src/pages/RecipesPage.jsx
 import { useState } from 'react'
 import RecipeCard  from '../components/RecipeCard'
 import RecipeModal from '../components/RecipeModal'
@@ -8,32 +7,32 @@ function RecipesPage({ recipes, ingredients, onSaveRecipe, onAddIngredient }) {
 
   return (
     <>
-      <header className="section-header">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="section-header__title">Mis Recetas</h1>
-          <p className="section-header__subtitle">
+          <h1 className="text-3xl font-bold">Mis Recetas</h1>
+          <p className="text-sm text-gray-500 mt-1">
             {recipes.length} receta{recipes.length !== 1 ? 's' : ''} guardada{recipes.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <button className="btn btn--primary" onClick={() => setIsModalOpen(true)}>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors duration-200 hover:opacity-90"
+          style={{ background: 'var(--color-primary)' }}
+        >
           + Nueva receta
         </button>
-      </header>
+      </div>
 
       <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         {recipes.map(recipe => (
-          <RecipeCard
-            key={recipe.id}
-            recipe={recipe}
-            ingredients={ingredients}
-          />
+          <RecipeCard key={recipe.id} recipe={recipe} ingredients={ingredients} />
         ))}
         <article
-          className="recipe-card recipe-card--empty"
           onClick={() => setIsModalOpen(true)}
+          className="border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-content gap-2 min-h-[200px] cursor-pointer transition-all duration-200 hover:border-[#728d6a] hover:bg-[#bed5cf]/20 justify-center"
         >
-          <span className="recipe-card__empty-icon">+</span>
-          <p className="recipe-card__empty-text">Agregar receta</p>
+          <span className="text-3xl text-gray-300">+</span>
+          <p className="text-sm text-gray-400">Agregar receta</p>
         </article>
       </div>
 
