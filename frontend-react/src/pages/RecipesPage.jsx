@@ -20,7 +20,7 @@ function RecipesPage({ recipes, ingredients, onSaveRecipe, onAddIngredient }) {
         </button>
       </header>
 
-      <div className="recipes-grid">
+      <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         {recipes.map(recipe => (
           <RecipeCard
             key={recipe.id}

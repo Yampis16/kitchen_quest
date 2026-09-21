@@ -1,7 +1,17 @@
 /* ============================================
    KITCHEN QUEST — Design System v0.1
    ============================================ */
+/* --- Tailwindcss --- */
+@import "tailwindcss";
 
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    color: #1B2D27;
+    background-color: #fdf4e5;
+  }
+}
 /* --- Variables globales --- */
 :root {
   /* Colores primarios */
@@ -52,8 +62,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: var(--font-sans);
-  font-size: var(--font-size-base);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
   background: var(--color-bg);
   color: var(--color-text-primary);
   line-height: 1.6;

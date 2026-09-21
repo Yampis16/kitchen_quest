@@ -8,27 +8,37 @@ import ShoppingListPage from './pages/ShoppingListPage'
 
 function Navbar() {
   return (
-    <nav className="navbar">
-      <div className="navbar__brand">
-        <span className="navbar__icon">🍳</span>
-        <span className="navbar__name">Kitchen Quest</span>
-      </div>
-      <div className="navbar__links">
-        {[
-          { to: '/recetas',      label: 'Recetas'      },
-          { to: '/menu-semanal', label: 'Menú semanal' },
-          { to: '/mercado',      label: 'Mercado'      },
-        ].map(({ to, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `navbar__link${isActive ? ' navbar__link--active' : ''}`
-            }
-          >
-            {label}
-          </NavLink>
-        ))}
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+      <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
+
+        <div className="flex items-center gap-2 text-lg font-bold" style={{ color: 'var(--color-primary)' }}>
+          <span className="text-2xl">🍳</span>
+          <span>Kitchen Quest</span>
+        </div>
+
+        <div className="flex items-center gap-8">
+          {[
+            { to: '/recetas',      label: 'Recetas'      },
+            { to: '/menu-semanal', label: 'Menú semanal' },
+            { to: '/mercado',      label: 'Mercado'      },
+            { to: '/ingredientes', label: 'Ingredientes' },
+          ].map(({ to, label }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `text-sm font-medium pb-0.5 border-b-2 transition-colors duration-200 ${
+                  isActive
+                    ? 'border-[#023d5b] text-[#023d5b]'
+                    : 'border-transparent text-gray-500 hover:text-[#023d5b] hover:border-[#023d5b]'
+                }`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+        </div>
+
       </div>
     </nav>
   )
@@ -73,6 +83,7 @@ function App() {
           }/>
           <Route path="/menu-semanal"  element={<WeeklyMenuPage  recipes={recipes} ingredients={ingredients} />} />
           <Route path="/mercado"       element={<ShoppingListPage recipes={recipes} ingredients={ingredients} />} />
+          <Route path="/ingredientes" element={<WeeklyMenuPage recipes={recipes} ingredients={ingredients} />} />
         </Routes>
       </main>
     </BrowserRouter>
