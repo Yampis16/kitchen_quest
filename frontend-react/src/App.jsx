@@ -1,13 +1,17 @@
 // src/App.jsx
 import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom'
 import useKitchenStore from './store/useKitchenStore'
+import useAuthStore    from './store/useAuthStore'
 import RecipesPage      from './pages/RecipesPage'
 import WeeklyMenuPage   from './pages/WeeklyMenuPage'
 import ShoppingListPage from './pages/ShoppingListPage'
 import IngredientsPage  from './pages/IngredientsPage'
+import LoginPage        from './pages/LoginPage'
 
 function Navbar() {
+  const { user, logout } = useAuthStore()
+
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-8 py-4 flex items-center justify-between">
@@ -36,50 +40,53 @@ function Navbar() {
             </NavLink>
           ))}
         </div>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-500">{user?.nombre}</span>
+          <button
+            onClick={logout}
+            className="text-sm font-medium px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </div>
     </nav>
   )
 }
 
-function App() {
+function ProtectedApp() {
   const fetchAll = useKitchenStore(state => state.fetchAll)
   const loading  = useKitchenStore(state => state.loading)
   const error    = useKitchenStore(state => state.error)
 
-  useEffect(() => {
-    fetchAll()
-  }, [])
+  useEffect(() => { fetchAll() }, [])
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center gap-4 flex flex-col">
-          <span className="text-5xl">⚠️</span>
-          <h2 className="text-xl font-semibold">No se pudo conectar con el servidor</h2>
-          <p className="text-sm text-gray-500">{error}</p>
-          <button onClick={fetchAll}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white mx-auto"
-            style={{ background: 'var(--color-primary)' }}>
-            Reintentar
-          </button>
-        </div>
+  if (error) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center flex flex-col gap-4">
+        <span className="text-5xl">⚠️</span>
+        <h2 className="text-xl font-semibold">No se pudo conectar con el servidor</h2>
+        <p className="text-sm text-gray-500">{error}</p>
+        <button onClick={fetchAll}
+          className="px-4 py-2 rounded-lg text-sm font-medium text-white mx-auto"
+          style={{ background: 'var(--color-primary)' }}>
+          Reintentar
+        </button>
       </div>
-    )
-  }
+    </div>
+  )
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center flex flex-col items-center gap-4">
-          <span className="text-4xl animate-spin">⚙️</span>
-          <p className="text-sm text-gray-500">Conectando con Kitchen Quest...</p>
-        </div>
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center flex flex-col items-center gap-4">
+        <span className="text-4xl animate-spin">⚙️</span>
+        <p className="text-sm text-gray-500">Conectando con Kitchen Quest...</p>
       </div>
-    )
-  }
+    </div>
+  )
 
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
       <main className="max-w-6xl mx-auto px-8 py-10">
         <Routes>
@@ -90,6 +97,23 @@ function App() {
           <Route path="/ingredientes" element={<IngredientsPage />} />
         </Routes>
       </main>
+    </>
+  )
+}
+
+function App() {
+  const user = useAuthStore(state => state.user)
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={
+          user ? <Navigate to="/recetas" replace /> : <LoginPage />
+        }/>
+        <Route path="/*" element={
+          user ? <ProtectedApp /> : <Navigate to="/login" replace />
+        }/>
+      </Routes>
     </BrowserRouter>
   )
 }
