@@ -2,12 +2,20 @@ import { useState } from 'react'
 import RecipeCard   from '../components/RecipeCard'
 import RecipeModal  from '../components/RecipeModal'
 import useKitchenStore from '../store/useKitchenStore'
+import useGroupStore from '../store/useGroupStore'
 
 function RecipesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const recipes     = useKitchenStore(state => state.recipes)
   const ingredients = useKitchenStore(state => state.ingredients)
   const addRecipe   = useKitchenStore(state => state.addRecipe)
+  const { toggleShare } = useGroupStore()
+
+  async function handleToggleShare(recipeId) {
+    await toggleShare(recipeId)
+    // Recarga recetas para reflejar el cambio
+    await useKitchenStore.getState().fetchAll()
+  }
 
   return (
     <>
@@ -27,10 +35,14 @@ function RecipesPage() {
         </button>
       </div>
 
-      <div className="grid gap-6"
-        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+      <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
         {recipes.map(recipe => (
-          <RecipeCard key={recipe.id} recipe={recipe} ingredients={ingredients} />
+          <RecipeCard
+            key={recipe.id}
+            recipe={recipe}
+            ingredients={ingredients}
+            onToggleShare={handleToggleShare}
+          />
         ))}
         <article
           onClick={() => setIsModalOpen(true)}

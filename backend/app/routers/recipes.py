@@ -64,3 +64,21 @@ def delete_recipe(
     db.delete(db_recipe)
     db.commit()
     return { "message": "Receta eliminada" }
+
+@router.patch("/{recipe_id}/share")
+def toggle_share(
+    recipe_id:    int,
+    db:           Session = Depends(get_db),
+    current_user: User    = Depends(get_current_user)
+):
+    recipe = db.query(Recipe).filter(
+        Recipe.id      == recipe_id,
+        Recipe.user_id == current_user.id
+    ).first()
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Receta no encontrada")
+
+    recipe.compartida = not recipe.compartida
+    db.commit()
+    db.refresh(recipe)
+    return { "id": recipe.id, "compartida": recipe.compartida }

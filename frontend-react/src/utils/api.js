@@ -49,4 +49,12 @@ export const api = {
   createRecipe: (data)     => request('POST',   '/recipes/', data),
   updateRecipe: (id, data) => request('PUT',    `/recipes/${id}`, data),
   deleteRecipe: (id)       => request('DELETE', `/recipes/${id}`),
+
+  // Grupos
+  getMyGroups:    ()       => request('GET',   '/groups/mine'),
+  createGroup:    (data)   => request('POST',  '/groups/', data),
+  joinGroup:      (data)   => request('POST',  '/groups/join', data),
+  leaveGroup:     (id)     => request('DELETE',`/groups/${id}/leave`),
+  getGroupRecipes:(id)     => request('GET',   `/groups/${id}/recipes`),
+  toggleShare:    (id)     => request('PATCH', `/recipes/${id}/share`),
 }

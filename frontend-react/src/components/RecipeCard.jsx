@@ -24,13 +24,13 @@ function MacroItem({ value, label, color }) {
   )
 }
 
-function RecipeCard({ recipe }) {
+// En RecipeCard.jsx — agrega al footer
+function RecipeCard({ recipe, onToggleShare }) {
   const ingredients = useKitchenStore(state => state.ingredients)
   const nutrition   = calcularNutricionReceta(recipe, ingredients)
 
   return (
     <article className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col gap-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer min-h-[200px]">
-
       <div className="flex items-start justify-between gap-2">
         <h2 className="text-lg font-semibold leading-snug">{recipe.nombre}</h2>
         <span className="text-xs font-medium px-2 py-0.5 rounded-full whitespace-nowrap shrink-0"
@@ -50,12 +50,25 @@ function RecipeCard({ recipe }) {
 
       <div className="flex items-center justify-between pt-3 border-t border-gray-100">
         <span className="text-sm text-gray-500">{recipe.tag}</span>
-        <button className="text-sm font-medium px-3 py-1.5 rounded-md border border-gray-200 transition-colors duration-200 hover:bg-[#bed5cf]"
-          style={{ color: 'var(--color-primary)' }}>
-          Ver receta →
-        </button>
+        <div className="flex items-center gap-2">
+          {onToggleShare && (
+            <button
+              onClick={e => { e.stopPropagation(); onToggleShare(recipe.id) }}
+              className={`text-xs px-2 py-1 rounded-lg border transition-colors ${
+                recipe.compartida
+                  ? 'border-[#023d5b] text-[#023d5b] bg-[#bed5cf]/20'
+                  : 'border-gray-200 text-gray-400 hover:border-[#023d5b] hover:text-[#023d5b]'
+              }`}
+            >
+              {recipe.compartida ? '👥 Compartida' : 'Compartir'}
+            </button>
+          )}
+          <button className="text-sm font-medium px-3 py-1.5 rounded-md border border-gray-200 transition-colors hover:bg-[#bed5cf]"
+            style={{ color: 'var(--color-primary)' }}>
+            Ver receta →
+          </button>
+        </div>
       </div>
-
     </article>
   )
 }

@@ -8,6 +8,7 @@ import WeeklyMenuPage   from './pages/WeeklyMenuPage'
 import ShoppingListPage from './pages/ShoppingListPage'
 import IngredientsPage  from './pages/IngredientsPage'
 import LoginPage        from './pages/LoginPage'
+import GroupsPage from './pages/GroupsPage'
 
 function Navbar() {
   const { user, logout } = useAuthStore()
@@ -26,6 +27,7 @@ function Navbar() {
             { to: '/menu-semanal', label: 'Menú semanal' },
             { to: '/mercado',      label: 'Mercado'      },
             { to: '/ingredientes', label: 'Ingredientes' },
+            { to: '/grupos', label: 'Grupos' },
           ].map(({ to, label }) => (
             <NavLink key={to} to={to}
               className={({ isActive }) =>
@@ -95,6 +97,7 @@ function ProtectedApp() {
           <Route path="/menu-semanal" element={<WeeklyMenuPage />} />
           <Route path="/mercado"      element={<ShoppingListPage />} />
           <Route path="/ingredientes" element={<IngredientsPage />} />
+          <Route path="/grupos" element={<GroupsPage />} />
         </Routes>
       </main>
     </>

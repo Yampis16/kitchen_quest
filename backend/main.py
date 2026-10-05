@@ -2,8 +2,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import Base, engine
-from app.models import user, recipe, ingredient  # ← importa todos los modelos
-from app.routers import recipes, ingredients, auth
+from app.routers import recipes, ingredients, auth, groups
+from app.models  import user, recipe, ingredient, group  # ← agrega group
 
 Base.metadata.create_all(bind=engine)
 
@@ -20,6 +20,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(recipes.router)
 app.include_router(ingredients.router)
+app.include_router(groups.router)
 
 @app.get("/")
 def root():

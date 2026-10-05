@@ -19,7 +19,9 @@ class RecipeUpdate(RecipeBase):
     pass
 
 class RecipeResponse(RecipeBase):
-    id: int
+    id:         int
+    user_id:    int
+    compartida: bool = False
 
     class Config:
         from_attributes = True
