@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useKitchenStore from '../store/useKitchenStore'
+import useGroupStore   from '../store/useGroupStore'
 
 const DAYS  = ['lunes','martes','miércoles','jueves','viernes','sábado','domingo']
 const MEALS = ['desayuno','almuerzo','cena','snack']
@@ -115,77 +116,105 @@ function MealSlot({ day, meal, assignment, recipes, onSet, onClear }) {
 
 // ── Vista principal ──────────────────────────────────────────
 function WeeklyMenuPage() {
-  const recipes    = useKitchenStore(state => state.recipes)
-  const weeklyMenu = useKitchenStore(state => state.weeklyMenu)
-  const setMeal    = useKitchenStore(state => state.setMeal)
-  const clearDay   = useKitchenStore(state => state.clearDay)
-  const clearWeek  = useKitchenStore(state => state.clearWeek)
+  const recipes          = useKitchenStore(state => state.recipes)
+  const weeklyMenu       = useKitchenStore(state => state.weeklyMenu)
+  const menuLoading      = useKitchenStore(state => state.menuLoading)
+  const activeGroupMenu  = useKitchenStore(state => state.activeGroupMenu)
+  const setMeal          = useKitchenStore(state => state.setMeal)
+  const clearDay         = useKitchenStore(state => state.clearDay)
+  const clearWeek        = useKitchenStore(state => state.clearWeek)
+  const fetchPersonalMenu = useKitchenStore(state => state.fetchPersonalMenu)
+  const fetchGroupMenu   = useKitchenStore(state => state.fetchGroupMenu)
 
-  function handleClearMeal(day, meal) {
-    setMeal(day, meal, null, 1)
+  const { groups, fetchGroups } = useGroupStore()
+
+  useEffect(() => { fetchGroups() }, [])
+
+  function handleMenuSwitch(groupId) {
+    if (groupId === 'personal') {
+      fetchPersonalMenu()
+    } else {
+      fetchGroupMenu(parseInt(groupId))
+    }
   }
 
-  const totalAssigned = DAYS.reduce((acc, day) =>
-    acc + MEALS.filter(meal => weeklyMenu[day]?.[meal] !== null).length
+  const totalAssigned = Object.values(weeklyMenu).reduce((acc, day) =>
+    acc + (day ? Object.values(day).filter(slot => slot !== null).length : 0)
   , 0)
+
+  const activeLabel = activeGroupMenu
+    ? groups.find(g => g.id === activeGroupMenu)?.nombre || 'Grupo'
+    : 'Personal'
 
   return (
     <>
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Menú Semanal</h1>
           <p className="text-sm text-gray-500 mt-1">
-            {totalAssigned} comida{totalAssigned !== 1 ? 's' : ''} planificada{totalAssigned !== 1 ? 's' : ''} esta semana
+            {totalAssigned} comida{totalAssigned !== 1 ? 's' : ''} planificada{totalAssigned !== 1 ? 's' : ''} · {activeLabel}
           </p>
         </div>
-        <button
-          onClick={clearWeek}
-          className="px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors text-gray-500"
-        >
-          Limpiar semana
-        </button>
-      </div>
-
-      {/* Grid semanal */}
-      <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
-        {DAYS.map(day => (
-          <div key={day} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
-
-            {/* Header del día */}
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold capitalize">{day}</h2>
-              <button
-                onClick={() => clearDay(day)}
-                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                Limpiar
-              </button>
-            </div>
-
-            {/* Comidas del día */}
-            <div className="flex flex-col gap-2">
-              {MEALS.map(meal => (
-                <div key={meal}>
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-xs">{MEAL_ICONS[meal]}</span>
-                    <span className="text-xs text-gray-400 capitalize">{meal}</span>
-                  </div>
-                  <MealSlot
-                    day={day}
-                    meal={meal}
-                    assignment={weeklyMenu[day]?.[meal]}
-                    recipes={recipes}
-                    onSet={setMeal}
-                    onClear={handleClearMeal}
-                  />
-                </div>
+        <div className="flex items-center gap-3">
+          {/* Selector de menú */}
+          {groups.length > 0 && (
+            <select
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-[#023d5b]"
+              value={activeGroupMenu || 'personal'}
+              onChange={e => handleMenuSwitch(e.target.value)}
+            >
+              <option value="personal">Mi menú personal</option>
+              {groups.map(g => (
+                <option key={g.id} value={g.id}>{g.nombre}</option>
               ))}
-            </div>
-
-          </div>
-        ))}
+            </select>
+          )}
+          <button
+            onClick={clearWeek}
+            className="px-4 py-2.5 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors text-gray-500"
+          >
+            Limpiar semana
+          </button>
+        </div>
       </div>
+
+      {menuLoading ? (
+        <div className="flex items-center justify-center min-h-[300px]">
+          <p className="text-sm text-gray-400">Cargando menú...</p>
+        </div>
+      ) : (
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+          {DAYS.map(day => (
+            <div key={day} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-semibold capitalize">{day}</h2>
+                <button onClick={() => clearDay(day)}
+                  className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                  Limpiar
+                </button>
+              </div>
+              <div className="flex flex-col gap-2">
+                {MEALS.map(meal => (
+                  <div key={meal}>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-xs">{MEAL_ICONS[meal]}</span>
+                      <span className="text-xs text-gray-400 capitalize">{meal}</span>
+                    </div>
+                    <MealSlot
+                      day={day}
+                      meal={meal}
+                      assignment={weeklyMenu[day]?.[meal]}
+                      recipes={recipes}
+                      onSet={setMeal}
+                      onClear={(d, m) => setMeal(d, m, null, 1)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   )
 }

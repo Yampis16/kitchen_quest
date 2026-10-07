@@ -2,8 +2,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import Base, engine
-from app.routers import recipes, ingredients, auth, groups
-from app.models  import user, recipe, ingredient, group  # ← agrega group
+from app.routers import recipes, ingredients, auth, groups, weekly_menu
+from app.models  import user, recipe, ingredient, group, weekly_menu as wm_model
 
 Base.metadata.create_all(bind=engine)
 
@@ -21,6 +21,7 @@ app.include_router(auth.router)
 app.include_router(recipes.router)
 app.include_router(ingredients.router)
 app.include_router(groups.router)
+app.include_router(weekly_menu.router)
 
 @app.get("/")
 def root():

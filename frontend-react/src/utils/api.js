@@ -57,4 +57,10 @@ export const api = {
   leaveGroup:     (id)     => request('DELETE',`/groups/${id}/leave`),
   getGroupRecipes:(id)     => request('GET',   `/groups/${id}/recipes`),
   toggleShare:    (id)     => request('PATCH', `/recipes/${id}/share`),
+
+  // Weekly menu
+  getPersonalMenu:  ()           => request('GET',  '/weekly-menu/personal'),
+  savePersonalMenu: (data)       => request('POST', '/weekly-menu/personal', { data }),
+  getGroupMenu:     (groupId)    => request('GET',  `/weekly-menu/group/${groupId}`),
+  saveGroupMenu:    (groupId, data) => request('POST', `/weekly-menu/group/${groupId}`, { data }),
 }

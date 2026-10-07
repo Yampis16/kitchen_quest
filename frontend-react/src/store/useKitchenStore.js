@@ -1,7 +1,6 @@
 // src/store/useKitchenStore.js
 import { create } from 'zustand'
 import { api } from '../utils/api'
-import { loadWeeklyMenu, saveWeeklyMenu } from '../utils/storage'
 
 const DAYS  = ['lunes','martes','miércoles','jueves','viernes','sábado','domingo']
 const MEALS = ['desayuno','almuerzo','cena','snack']
@@ -17,9 +16,10 @@ const useKitchenStore = create((set, get) => ({
   // ── Estado ────────────────────────────────────────
   recipes:     [],
   ingredients: [],
-  weeklyMenu:  loadWeeklyMenu(),
-  loading:     true,
-  error:       null,
+  // Menú semanal — ahora en el backend
+  weeklyMenu:   {},
+  menuLoading:  false,
+  activeGroupMenu: null,
 
   // ── Carga inicial desde la API ────────────────────
   fetchAll: async () => {
@@ -30,6 +30,10 @@ const useKitchenStore = create((set, get) => ({
         api.getIngredients(),
       ])
       set({ recipes, ingredients, loading: false })
+      // Migra localStorage si hay algo
+      await get().migrateLocalMenu()
+      // Carga el menú personal
+      await get().fetchPersonalMenu()
     } catch (e) {
       set({ error: e.message, loading: false })
     }
@@ -119,29 +123,93 @@ const useKitchenStore = create((set, get) => ({
   },
 
   // ── Menú semanal (sigue en localStorage) ─────────
-  setMeal: (day, meal, recipeId, porciones) => {
-    const weeklyMenu = {
-      ...get().weeklyMenu,
-      [day]: { ...get().weeklyMenu[day], [meal]: recipeId ? { recipeId, porciones } : null }
+  fetchPersonalMenu: async () => {
+    set({ menuLoading: true, activeGroupMenu: null })  // ← null para personal
+    try {
+      const menu = await api.getPersonalMenu()
+      console.log('Menú personal:', menu.data)
+      set({ weeklyMenu: menu.data || emptyWeek(), menuLoading: false })
+    } catch (e) {
+      console.error('Error menú personal:', e)
+      set({ weeklyMenu: emptyWeek(), menuLoading: false })
     }
-    set({ weeklyMenu })
-    saveWeeklyMenu(weeklyMenu)
   },
 
-  clearDay: (day) => {
-    const weeklyMenu = {
-      ...get().weeklyMenu,
-      [day]: Object.fromEntries(MEALS.map(meal => [meal, null]))
+  fetchGroupMenu: async (groupId) => {
+    set({ menuLoading: true, activeGroupMenu: groupId })
+    try {
+      const menu = await api.getGroupMenu(groupId)
+      console.log('Menú grupo:', menu.data)
+      set({ weeklyMenu: menu.data || emptyWeek(), menuLoading: false })
+    } catch (e) {
+      console.error('Error menú grupo:', e)
+      set({ weeklyMenu: emptyWeek(), menuLoading: false })
     }
-    set({ weeklyMenu })
-    saveWeeklyMenu(weeklyMenu)
   },
 
-  clearWeek: () => {
-    const weeklyMenu = emptyWeek()
-    set({ weeklyMenu })
-    saveWeeklyMenu(weeklyMenu)
-  },
+setMeal: async (day, meal, recipeId, porciones) => {
+  const current = get().weeklyMenu
+  const updated = {
+    ...current,
+    [day]: {
+      ...current[day],
+      [meal]: recipeId ? { recipeId, porciones } : null
+    }
+  }
+  set({ weeklyMenu: updated })
+
+  // Guarda en el backend
+  const groupId = get().activeGroupMenu
+  if (groupId) {
+    await api.saveGroupMenu(groupId, updated)
+  } else {
+    await api.savePersonalMenu(updated)
+  }
+},
+
+clearDay: async (day) => {
+  const current = get().weeklyMenu
+  const updated = {
+    ...current,
+    [day]: Object.fromEntries(MEALS.map(meal => [meal, null]))
+  }
+  set({ weeklyMenu: updated })
+  const groupId = get().activeGroupMenu
+  if (groupId) {
+    await api.saveGroupMenu(groupId, updated)
+  } else {
+    await api.savePersonalMenu(updated)
+  }
+},
+
+clearWeek: async () => {
+  const updated = emptyWeek()
+  set({ weeklyMenu: updated })
+  const groupId = get().activeGroupMenu
+  if (groupId) {
+    await api.saveGroupMenu(groupId, updated)
+  } else {
+    await api.savePersonalMenu(updated)
+  }
+},
+
+migrateLocalMenu: async () => {
+  const saved = localStorage.getItem('kq-weekly-menu')
+  if (!saved) return
+  try {
+    const data = JSON.parse(saved)
+    const hasContent = Object.values(data).some(day =>
+      Object.values(day).some(slot => slot !== null)
+    )
+    if (hasContent) {
+      await api.savePersonalMenu(data)
+      console.log('Menú migrado al backend')
+    }
+    localStorage.removeItem('kq-weekly-menu')
+  } catch (e) {
+    console.error('Error migrando menú:', e)
+  }
+},
 
 }))
 
