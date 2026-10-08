@@ -56,6 +56,31 @@ function Navbar() {
   )
 }
 
+function BottomNav() {
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 flex md:hidden">
+      {[
+        { to: '/recetas',      icon: '🍳', label: 'Recetas'   },
+        { to: '/menu-semanal', icon: '📅', label: 'Menú'      },
+        { to: '/mercado',      icon: '🛒', label: 'Mercado'   },
+        { to: '/ingredientes', icon: '🥕', label: 'Ingredientes' },
+        { to: '/grupos',       icon: '👥', label: 'Grupos'    },
+      ].map(({ to, icon, label }) => (
+        <NavLink key={to} to={to}
+          className={({ isActive }) =>
+            `flex-1 flex flex-col items-center justify-center py-3 gap-0.5 text-xs transition-colors ${
+              isActive ? 'text-[#023d5b] font-medium' : 'text-gray-400'
+            }`
+          }
+        >
+          <span className="text-lg leading-none">{icon}</span>
+          <span>{label}</span>
+        </NavLink>
+      ))}
+    </nav>
+  )
+}
+
 function ProtectedApp() {
   const fetchAll = useKitchenStore(state => state.fetchAll)
   const loading  = useKitchenStore(state => state.loading)
@@ -90,7 +115,7 @@ function ProtectedApp() {
   return (
     <>
       <Navbar />
-      <main className="max-w-6xl mx-auto px-8 py-10">
+      <main className="max-w-6xl mx-auto px-4 md:px-8 py-6 pb-24 md:pb-10">
         <Routes>
           <Route path="/"             element={<RecipesPage />} />
           <Route path="/recetas"      element={<RecipesPage />} />
@@ -100,6 +125,7 @@ function ProtectedApp() {
           <Route path="/grupos" element={<GroupsPage />} />
         </Routes>
       </main>
+      <BottomNav />
     </>
   )
 }

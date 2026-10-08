@@ -127,7 +127,6 @@ const useKitchenStore = create((set, get) => ({
     set({ menuLoading: true, activeGroupMenu: null })  // ← null para personal
     try {
       const menu = await api.getPersonalMenu()
-      console.log('Menú personal:', menu.data)
       set({ weeklyMenu: menu.data || emptyWeek(), menuLoading: false })
     } catch (e) {
       console.error('Error menú personal:', e)
@@ -139,7 +138,6 @@ const useKitchenStore = create((set, get) => ({
     set({ menuLoading: true, activeGroupMenu: groupId })
     try {
       const menu = await api.getGroupMenu(groupId)
-      console.log('Menú grupo:', menu.data)
       set({ weeklyMenu: menu.data || emptyWeek(), menuLoading: false })
     } catch (e) {
       console.error('Error menú grupo:', e)
