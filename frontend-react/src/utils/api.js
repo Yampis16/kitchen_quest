@@ -1,5 +1,5 @@
 // src/utils/api.js
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function getToken() {
   return localStorage.getItem('kq-token')

@@ -11,7 +11,11 @@ app = FastAPI(title="Kitchen Quest API", version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "https://kitchen-quest-blush.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

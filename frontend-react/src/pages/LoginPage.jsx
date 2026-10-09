@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useAuthStore    from '../store/useAuthStore'
 import useKitchenStore from '../store/useKitchenStore'
+import { api } from '../utils/api'
 
 function LoginPage() {
   const [mode, setMode]       = useState('login') // 'login' | 'register'
@@ -17,7 +18,7 @@ function LoginPage() {
   async function handleSubmit() {
     if (mode === 'register') {
       try {
-        await import('../utils/api').then(m => m.api.register({ nombre, email, password }))
+        await api.register({ nombre, email, password })
       } catch (e) {
         return
       }
