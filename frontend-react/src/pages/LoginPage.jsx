@@ -40,7 +40,7 @@ function LoginPage() {
         <div className="text-center mb-8">
           <span className="text-5xl">🍳</span>
           <h1 className="text-2xl font-bold mt-3" style={{ color: 'var(--color-primary)' }}>
-            Kitchen Quest
+            Kitchen Quest 🍳
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             {mode === 'login' ? 'Inicia sesión en tu cuenta' : 'Crea tu cuenta'}
