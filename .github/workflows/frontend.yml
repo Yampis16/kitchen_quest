@@ -1,0 +1,36 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend-react/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frontend-react/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend-react/package-lock.json
+
+      - name: Instalar dependencias
+        working-directory: frontend-react
+        run: npm ci
+
+      - name: Verificar build
+        working-directory: frontend-react
+        run: npm run build
+        env:
+          VITE_API_URL: https://proud-adventure-production-5d80.up.railway.app
